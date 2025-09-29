@@ -1,0 +1,94 @@
+4A] Logindemo.php
+<?php
+session_start();
+// Pre-fill from session or cookie
+$prefill_user = isset($_SESSION['username']) ? $_SESSION['username'] :
+ (isset($_COOKIE['username']) ? $_COOKIE['username'] : '');
+$prefill_pass = isset($_SESSION['password']) ? $_SESSION['password'] :
+ (isset($_COOKIE['password']) ? $_COOKIE['password'] : '');
+if (isset($_POST["btnlogin"])) {
+ $user = $_POST["username"];
+ $pass = $_POST["password"];
+ $remember = isset($_POST["remember"]);
+ if ($user == "" || $pass == "") {
+ echo "<script>alert('Username or password cannot be empty');</script>";
+ } else if ($user == "Saif" && $pass == "admin123") {
+ $_SESSION['username'] = $user;
+ $_SESSION['password'] = $pass;
+ if ($remember) {
+ setcookie("username", $user, time() + (86400 * 30), "/"); // 30 days
+ setcookie("password", $pass, time() + (86400 * 30), "/");
+ } else {
+ setcookie("username", "", time() - 3600, "/");
+setcookie("password", "", time() - 3600, "/");
+ }
+ header("Location: welcome.php");
+ exit();
+ } else {
+ echo "<script>alert('Invalid credentials');</script>";
+ }
+}
+?>
+<html>
+<head>
+ <title>Login</title>
+</head>
+<body>
+<form method="post">
+ Saif-TCS2526010<br><br>
+ Username <input type="text" name="username" value="<?php echo $prefill_user;
+?>"><br><br>
+ Password <input type="password" name="password" value="<?php echo $prefill_pass;
+?>"><br><br>
+ <input type="checkbox" name="remember"
+ <?php if (isset($_COOKIE['username'])) echo 'checked'; ?>>
+ Remember Me<br><br>
+ <input type="submit" name="btnlogin" value="Login"><br><br>
+</form>
+</body>
+</html>
+
+Welcome.php
+<?php
+session_start();
+echo "<h1>Welcome " . $_SESSION['username'] . "</h1>";
+?>
+<html>
+<head>
+ <title>Welcome</title>
+</head>
+<body>
+ <a href="logout.php">Logout</a>
+</body>
+</html>
+
+
+Logout.php
+<?php
+session_start();
+session_unset();
+session_destroy();
+// Clear cookies too (optional if you want to forget login info)
+setcookie("username", "", time() - 3600, "/");
+setcookie("password", "", time() - 3600, "/");
+header("Location: logindemo.php");
+?>
+
+4B] <form method="post">
+ <input type="text" name="cookie_value" placeholder="Enter cookie value"><br><br>
+ <button type="submit" name="set_cookie">Set Cookie</button><br><br>
+ <button type="submit" name="get_cookie">Get Cookie</button>
+</form>
+<?php
+if (isset($_POST['set_cookie'])) {
+ $value = $_POST['cookie_value'];
+ setcookie('my_cookie', $value, time() + (86400), "/");
+ echo "Cookie has been set" ;
+} elseif (isset($_POST['get_cookie'])) {
+ if (isset($_COOKIE['my_cookie'])) {
+ echo "Stored cookie value: " . htmlspecialchars($_COOKIE['my_cookie']);
+ } else {
+ echo "No cookie is set.";
+ }
+}
+?>
