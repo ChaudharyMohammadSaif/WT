@@ -187,3 +187,434 @@ res.json({ balance });
 app.listen(3000, () =>
 console.log("Server running at host http://localhost:3000")
 );
+
+12B] Outside.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Outside Page</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+background-color: #f0f8ff;
+margin: 40px;
+text-align: center;
+}
+h1 {
+color: #333;
+}
+p {
+font-size: 1.2rem;
+color: #666;
+}
+</style>
+</head>
+<body>
+<h1>Welcome to the Outside Page</h1>
+<h2>Chaudhary Mohammad Saif - TCS2526010 </h2>
+<p>This is the content served by your Node.js server.</p>
+</body>
+</html>
+Server3.js
+const http = require("http");
+const fs = require("fs");
+const server = http.createServer((req, res) => {
+// Read the HTML file
+fs.readFile("outside.html", (err, data) => {
+if (err) {
+res.writeHead(404, { "Content-Type": "text/html" });
+res.end("<h1>404 File Not Found</h1>");
+} else {
+res.writeHead(200, { "Content-Type": "text/html" });
+res.end(data); // Send HTML content as response
+}
+});
+});
+server.listen(4000, () => {
+console.log("Server running at http://localhost:4000/");
+});
+
+2A] Write a php program to read number from file calculate its reverse and store the result in
+another file.
+Code:-
+<html>
+<head>
+<title>Files Operations</title>
+</head>
+<body>
+<form method="get">
+<input type="submit" name="readnum" value="Read number from file"/>
+<input type="submit" name="rev" value="Write reverse to file"/>
+</form>
+<?php
+if(isset($_GET['readnum']))
+{
+$myfile1=fopen("input.txt","r") or die("Unable to open file")
+$n=fgets($myfile1);
+echo "Number is: ".$n;
+fclose($myfile1);
+}
+if(isset($_GET['rev']))
+{
+$myfile1=fopen("input.txt","r") or die("Unable to open file")
+$n=fgets($myfile1);
+$reverse=0;
+while($n>0)
+{
+$reverse=$reverse*10;
+$reverse=$reverse+$n%10;
+$n=(int)($n/10);
+}
+$myfile2=fopen("output.txt","w") or die("Unable to open file")
+fwrite($myfile2,$reverse);
+echo "Reverse is: ".$reverse;
+fclose($myfile1);
+fclose($myfile2);
+}
+?>
+</body>
+</html>
+
+2B] Write a php program to count how many number of words are there in file also check
+whether given word present in the file or not.
+Code:-
+<html>
+<head>
+ <title>Word Count & Search</title>
+</head>
+<body>
+ <h2>Check Word Presence in Existing File</h2>
+ <form method="POST">
+ <label>Enter word to search:</label>
+ <input type="text" name="searchWord" required><br><br>
+ <input type="submit" name="submit" value="Analyze">
+ </form>
+ <?php
+ if (isset($_POST['submit'])) {
+ $word = strtolower($_POST['searchWord']);
+ $filePath = "example.txt"; // Make sure this file exists in the same directory
+ if (file_exists($filePath)) {
+ $content = file_get_contents($filePath);
+ $wordCount = str_word_count($content);
+ echo "<h3>Total words in 'example.txt': $wordCount</h3>";
+ if (stripos($content, $word) !== false) {
+ echo "<p>The word <strong>'$word'</strong> is present in the file</p>";
+ } else {
+ echo "<p>The word <strong>'$word'</strong> is NOT present in the file</p>";
+ }
+ } else {
+echo "<p>File 'example.txt' not found.</p>";
+ }
+ }
+ ?>
+</body>
+</html>
+
+2C] Write a php program to take employee details like eid, name, city and salary from user and
+append data in file.
+Code:-
+<html>
+<head>
+ <title>Employee Data Entry</title>
+</head>
+<body>
+ <h2>Enter Employee Details</h2>
+ <form method="POST">
+ <label>Employee ID:</label>
+ <input type="text" name="eid" required><br><br>
+ <label>Name:</label>
+ <input type="text" name="name" required><br><br>
+ <label>City:</label>
+ <input type="text" name="city" required><br><br>
+ <label>Salary:</label>
+ <input type="number" name="salary" required><br><br>
+ <input type="submit" name="submit" value="Save Employee">
+ </form>
+ <?php
+ if (isset($_POST['submit'])) {
+ $eid = $_POST['eid'];
+ $name = $_POST['name'];
+ $city = $_POST['city'];
+ $salary = $_POST['salary'];
+$data = "$eid, $name, $city, $salary\n";
+ file_put_contents("employees.txt", $data, FILE_APPEND);
+ echo "<p> Employee details saved successfully!</p>";
+ }
+ ?>
+</body>
+</html>
+
+6] Index.php
+<?php
+// Database Connection
+$host = "localhost";
+$dbname = "pizza_shop";
+$username = "root";
+$password = ""; // change if you have password
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database Connection Failed: " . $e->getMessage());
+}
+
+// Table create (only once run hoga)
+$pdo->exec("CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    pizza_type VARCHAR(50) NOT NULL,
+    quantity INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
+
+$message = "";
+
+// Order Insert
+if (isset($_POST['place_order'])) {
+    $name = $_POST['customer_name'];
+    $pizza_type = $_POST['pizza_type'];
+    $quantity = $_POST['quantity'];
+
+    $sql = "INSERT INTO orders (customer_name, pizza_type, quantity)
+            VALUES (:name, :pizza_type, :quantity)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':name' => $name,
+        ':pizza_type' => $pizza_type,
+        ':quantity' => $quantity
+    ]);
+
+    $message = "Order placed successfully!";
+}
+
+// Search
+$searchResults = [];
+if (isset($_POST['search_order'])) {
+    $search = "%".$_POST['search']."%";
+    $sql = "SELECT * FROM orders WHERE customer_name LIKE :search OR id LIKE :search";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':search' => $search]);
+    $searchResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pizza Order System</title>
+</head>
+<body>
+    <h1>Pizza Order System</h1>
+
+    <?php if($message) echo "<p style='color:green;'>$message</p>"; ?>
+
+    <h2>Place Your Pizza Order</h2>
+    <form method="POST">
+        <label>Customer Name:</label><br>
+        <input type="text" name="customer_name" required><br><br>
+
+        <label>Select Pizza:</label><br>
+        <select name="pizza_type" required>
+            <option value="">--Select--</option>
+            <option>Margherita</option>
+            <option>Pepperoni</option>
+            <option>Veggie</option>
+            <option>Cheese Burst</option>
+        </select><br><br>
+
+        <label>Quantity:</label><br>
+        <input type="number" name="quantity" min="1" value="1" required><br><br>
+
+        <button type="submit" name="place_order">Place Order</button>
+    </form>
+
+    <h2>Search Orders</h2>
+    <form method="POST">
+        <input type="text" name="search" placeholder="Search by Order ID or Name" required>
+        <button type="submit" name="search_order">Search</button>
+    </form>
+
+    <?php if (!empty($searchResults)) : ?>
+        <h3>Search Results:</h3>
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>ID</th>
+                <th>Customer Name</th>
+                <th>Pizza Type</th>
+                <th>Quantity</th>
+                <th>Order Time</th>
+            </tr>
+            <?php foreach ($searchResults as $row) : ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['id']); ?></td>
+                    <td><?= htmlspecialchars($row['customer_name']); ?></td>
+                    <td><?= htmlspecialchars($row['pizza_type']); ?></td>
+                    <td><?= htmlspecialchars($row['quantity']); ?></td>
+                    <td><?= htmlspecialchars($row['created_at']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    <?php endif; ?>
+
+</body>
+</html>
+
+10]
+create model
+
+database/migrations/xxxx_xx_xx_create_students_table.php:
+public function up()
+{
+ Schema::create('students', function (Blueprint $table) {
+ $table->id();
+ $table->string('name');
+ $table->string('email')->unique();
+ $table->timestamps();
+ });
+}
+Run migration:
+php artisan migrate
+
+create controller
+
+In routes/web.php:
+use App\Http\Controllers\StudentController;
+Route::resource('students', StudentController::class);
+
+Open app/Http/Controllers/StudentController.php:
+<?php
+namespace App\Http\Controllers;
+use App\Models\Student;
+use Illuminate\Http\Request;
+class StudentController extends Controller
+{
+ // Show all students
+ public function index()
+ {
+ $students = Student::all();
+ return view('students.index', compact('students'));
+ }
+ // Show create form
+ public function create()
+ {
+ return view('students.create');
+}
+ // Save new student
+ public function store(Request $request)
+ {
+ $request->validate([
+ 'name' => 'required',
+ 'email' => 'required|email|unique:students',
+ ]);
+ Student::create($request->all());
+ return redirect()->route('students.index')->with('success','Student added
+successfully.');
+ }
+ // Show edit form
+ public function edit(Student $student)
+ {
+ return view('students.edit', compact('student'));
+ }
+ // Update student
+ public function update(Request $request, Student $student)
+ {
+ $request->validate([
+ 'name' => 'required',
+ 'email' => 'required|email|unique:students,email,'.$student->id,
+]);
+ $student->update($request->all());
+ return redirect()->route('students.index')->with('success','Student updated
+successfully.');
+ }
+ // Delete student
+ public function destroy(Student $student)
+ {
+ $student->delete();
+ return redirect()->route('students.index')->with('success','Student deleted
+successfully.');
+ }
+}
+
+In app/Models/Student.php:
+class Student extends Model
+{
+ protected $fillable = ['name','email'];
+}
+
+Create folder: resources/views/students/
+index.blade.php
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Students CRUD</title>
+</head>
+<body>
+ <h1>Students List</h1>
+ <a href="{{ route('students.create') }}">Add Student</a>
+ <br><br>
+ @if(session('success'))
+ <p style="color:green;">{{ session('success') }}</p>
+ @endif
+ <table border="1" cellpadding="5">
+ <tr>
+<th>ID</th><th>Name</th><th>Email</th><th>Actions</th>
+ </tr>
+ @foreach ($students as $student)
+ <tr>
+ <td>{{ $student->id }}</td>
+ <td>{{ $student->name }}</td>
+ <td>{{ $student->email }}</td>
+ <td>
+ <a href="{{ route('students.edit', $student->id) }}">Edit</a> |
+ <form action="{{ route('students.destroy', $student->id) }}"
+method="POST" style="display:inline;">
+ @csrf
+ @method('DELETE')
+ <button type="submit" onclick="return confirm('Delete this
+student?')">Delete</button>
+ </form>
+ </td>
+ </tr>
+ @endforeach
+ </table>
+</body>
+</html>
+
+create.blade.php
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Add Student</title>
+</head>
+<body>
+ <h1>Add Student</h1>
+ <form action="{{ route('students.store') }}" method="POST">
+ @csrf
+ Name: <input type="text" name="name"><br><br>
+ Email: <input type="email" name="email"><br><br>
+ <button type="submit">Save</button>
+ </form>
+</body>
+</html>
+
+edit.blade.php
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Edit Student</title>
+</head>
+<body>
+ <h1>Edit Student</h1>
+ <form action="{{ route('students.update', $student->id) }}" method="POST">
+ @csrf
+ @method('PUT')
+ Name: <input type="text" name="name" value="{{ $student->name
+}}"><br><br>
+ Email: <input type="email" name="email" value="{{ $student->email
+}}"><br><br>
+ <button type="submit">Update</button>
+ </form>
+</body>
+</html>
